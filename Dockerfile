@@ -1,7 +1,8 @@
 FROM qnib/alpn-base
 
 ENV CONSUL_VER=0.6.4 \
-    CT_VER=0.14.0
+    CT_VER=0.15.0 \
+    QNIB_CONSUL=0.1.3.4
 
 RUN apk add --update curl unzip jq nmap \
  && curl -fso /tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VER}/consul_${CONSUL_VER}_linux_amd64.zip \
@@ -20,6 +21,6 @@ RUN apk add --update curl unzip jq nmap \
  && apk del unzip \
  && rm -f /var/cache/apk/*
 ADD etc/consul.d/agent.json /etc/consul.d/
-ADD opt/qnib/consul/bin/start.sh /opt/qnib/consul/bin/
+RUN curl -fsL https://github.com/qnib/consul-content/releases/download/${QNIB_CONSUL}/consul.tar |tar xf - -C /opt/qnib/
 VOLUME ["/opt/qnib/consul/bin/", "/etc/consul.d"]
 CMD ["/opt/qnib/consul/bin/start.sh"]
