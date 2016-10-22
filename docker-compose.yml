@@ -1,0 +1,17 @@
+version: '2'
+services:
+  master:
+    image: qnib/alplain-consul
+    hostname: master
+    container_name: master
+    ports:
+     - "8500:8500"
+    environment:
+     - DC_NAME=dc1
+     - CONSUL_BOOTSTRAP_EXPECT=1
+
+  client:
+    image: qnib/alplain-consul
+    environment:
+     - DC_NAME=dc1
+     - CONSUL_CLUSTER_IPS=master

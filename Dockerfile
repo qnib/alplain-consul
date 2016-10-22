@@ -2,7 +2,8 @@ FROM qnib/alplain-init
 
 ARG CONSUL_VER=0.7.0
 ARG CT_VER=0.16.0
-ENV CONSUL_BIN=/opt/qnib/consul/bin/consul
+ENV CONSUL_BIN=/opt/qnib/consul/bin/consul \
+    PATH=${PATH}:/opt/qnib/consul/bin/
 
 RUN apk --no-cache add curl unzip jq nmap \
  && curl -fso /tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VER}/consul_${CONSUL_VER}_linux_amd64.zip \
