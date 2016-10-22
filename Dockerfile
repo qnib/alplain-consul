@@ -1,10 +1,10 @@
-FROM qnib/alpn-base
+FROM qnib/alplain-init
 
-ENV CONSUL_VER=0.6.4 \
-    CT_VER=0.15.0 \
-    QNIB_CONSUL=0.1.3.4
+ARG CONSUL_VER=0.7.0
+ARG CT_VER=0.16.0
+ENV CONSUL_BIN=/opt/qnib/consul/bin/consul
 
-RUN apk add --update curl unzip jq nmap \
+RUN apk --no-cache add curl unzip jq nmap \
  && curl -fso /tmp/consul.zip https://releases.hashicorp.com/consul/${CONSUL_VER}/consul_${CONSUL_VER}_linux_amd64.zip \
  && mkdir -p /opt/qnib/consul/bin/ \
  && cd /opt/qnib/consul/bin/ \
@@ -18,9 +18,12 @@ RUN apk add --update curl unzip jq nmap \
  && curl -Lso /tmp/consul-template.zip https://releases.hashicorp.com/consul-template/${CT_VER}/consul-template_${CT_VER}_linux_amd64.zip \
  && cd /opt/qnib/consul/bin/ \
  && unzip /tmp/consul-template.zip \
- && apk del unzip \
- && rm -f /var/cache/apk/*
+ && apk --no-cache del unzip
 ADD etc/consul.d/agent.json /etc/consul.d/
-RUN curl -fsL https://github.com/qnib/consul-content/releases/download/${QNIB_CONSUL}/consul.tar |tar xf - -C /opt/qnib/
+RUN wget -qO /usr/local/bin/go-github https://github.com/qnib/go-github/releases/download/0.2.2/go-github_0.2.2_MuslLinux \
+ && chmod +x /usr/local/bin/go-github \
+ && echo "# download: $(/usr/local/bin/go-github rLatestUrl --ghorg qnib --ghrepo consul-content --regex 'consul.tar$' |head -n1)" \
+ && wget -qO - $(/usr/local/bin/go-github rLatestUrl --ghorg qnib --ghrepo consul-content --regex 'consul.tar$' |head -n1) |tar xf - -C /opt/qnib/ \
+ && rm -f /usr/local/bin/go-github
 VOLUME ["/opt/qnib/consul/bin/", "/etc/consul.d"]
 CMD ["/opt/qnib/consul/bin/start.sh"]
